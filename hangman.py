@@ -1,5 +1,4 @@
-import random
-import re
+import random, re, math
 
 # Function checks if the string contains any special character
 def run(newstring):
@@ -120,27 +119,34 @@ Graphics = [r'''
 
 #keeping a record of letters you've entered to validate any potential duplicates
 enteredletterlist = []
+wrongLetters = []
 
 #random word picker
 word = (random.choice(validwords)).lower()
+
+print(word)
 
 #you figure it out I don't care anymore
 guesslen = len(word)
 
 #does what it says on the tin
-totallives = len(word)
+totallives = math.ceil(50 / len(word))
 
 #starting life message
 print("you have",totallives,"lives or you die")
 
 #hint determiner
 hiddenword = ["_"]*len(word)
+print(*hiddenword)
 
 #Basically says while you haven't guessed the word and you haven't died, continue playing
 while guesslen > 0 and totallives > 0:
 
+
+    print("Incorrect letters: ", *wrongLetters)
+
     #guess inputer
-    guess = (input("guess a letter: ")).lower()
+    guess = (input("guess a letter:")).lower()
 
     #input validation to stop you from entering a key that is a duplicate, non-letter or multiple letters at a time
     while guess in enteredletterlist or guess.isalpha() == False or len(guess) > 1:
@@ -158,14 +164,13 @@ while guesslen > 0 and totallives > 0:
 
 
     #replacing the hidden letter in it's location if you guessed correct
-    for eachletter in word:
-        if guess == eachletter:
-            i = word.index(eachletter)
+    for i in range(len(word)):
+        if guess == word[i]:
             hiddenword[i] = guess
-        else:
-            for position, letter in enumerate(word):
-                if letter == guess:
-                    hiddenword[position] = guess
+        #else:
+         #   for position, letter in enumerate(word):
+          #      if letter == guess:
+           #         hiddenword[position] = guess
     
 
     #sending every new letter to the non-duplicate list
@@ -180,6 +185,7 @@ while guesslen > 0 and totallives > 0:
     else:
         totallives -= 1
         print("wrong, you have",totallives,"lives left")    
+        wrongLetters.append(guess)
     
 
     #displaying the life state of the hangman depending on how many lives are left
