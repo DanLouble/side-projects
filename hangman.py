@@ -1,18 +1,7 @@
-import random, re, math
+import random, math, webbrowser
 
 # Function checks if the string contains any special character
-def run(newstring):
 
-
-    unwantedCharactersList = re.compile("[@_!#$%^&*('<>?/\|}{~:]")
-    
-    # Pass the string in search 
-    # method of object.    
-    if(unwantedCharactersList.search(newstring) == None):
-        return True
-        
-    else:
-        return False
 
 filename = "/usr/share/dict/british-english"
 
@@ -43,16 +32,20 @@ for i in range(len(DictionaryWords)):
 
 
     #checkpoint-works well up to here so far
-    if run(newstring) and 12 > len(newstring) > 4:
+    if newstring.isalpha() and 14 > len(newstring) > 4:
         #adding the grabbed word to the valid word list if it has no special characters
         validwords.append(newstring)
         #resetting the item string verifier
         newstring = newstring.replace('',newstring)
    
    #if the string verifier has a special character
-    elif run(newstring) == False:
-        #sending bad words to the naughty list
-        invalidwords.append(newstring)
+    elif newstring.isalpha() == False:
+        if newstring.find("'s") == True:
+            newstring.strip("'s")
+            validwords.append(newstring)
+        else:
+            #sending bad words to the naughty list
+            invalidwords.append(newstring)
 
         #resetting the item string verifier
         newstring = newstring.replace('',newstring)
@@ -124,7 +117,9 @@ wrongLetters = []
 #random word picker
 word = (random.choice(validwords)).lower()
 
-print(word)
+#print(word)
+
+print(invalidwords)
 
 #you figure it out I don't care anymore
 guesslen = len(word)
@@ -143,7 +138,8 @@ print(*hiddenword)
 while guesslen > 0 and totallives > 0:
 
 
-    print("Incorrect letters: ", *wrongLetters)
+    if len(wrongLetters) > 0:
+        print("Incorrect letters: ", *wrongLetters)
 
     #guess inputer
     guess = (input("guess a letter:")).lower()
@@ -166,6 +162,7 @@ while guesslen > 0 and totallives > 0:
     #replacing the hidden letter in it's location if you guessed correct
     for i in range(len(word)):
         if guess == word[i]:
+
             hiddenword[i] = guess
         #else:
          #   for position, letter in enumerate(word):
@@ -196,10 +193,21 @@ while guesslen > 0 and totallives > 0:
     
 #win message after the game is over.
 if guesslen == 0:
-    print("congratulations, hangman survives! The word is",word)  
+    print("congratulations, hangman survives! The word is",word)
+    if len(wrongLetters) == 0:
+        print("Perfect game!!")
 
 #lose message after you lost and hangman dies     
 if totallives == 0:
     print(" ")
     print("you died. The word was",word)
     print(" ")
+# if you wan t know the word meaning
+question = input("do you want to know the meaning of " + word+"? ")
+
+try: 
+    #if first letter is y 
+    if question[0].lower() == "y":    
+        webbrowser.open('https://www.merriam-webster.com/dictionary/' + word)
+except IndexError:
+    pass
