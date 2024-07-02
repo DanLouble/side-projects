@@ -1,4 +1,4 @@
-import random, math, webbrowser
+import random, math, requests, json
 
 # Function checks if the string contains any special character
 
@@ -15,8 +15,6 @@ validwords = []
 
 #list of words that don't make it past the filter stage such as "that's" due to the apostrophe
 invalidwords = []
-
-
 
 #loop to run until valid words has 100 items
 for i in range(len(DictionaryWords)):
@@ -40,13 +38,7 @@ for i in range(len(DictionaryWords)):
    
    #if the string verifier has a special character
     elif newstring.isalpha() == False:
-        if newstring.find("'s") == True:
-            newstring.strip("'s")
-            validwords.append(newstring)
-        else:
-            #sending bad words to the naughty list
-            invalidwords.append(newstring)
-
+        invalidwords.append(newstring)
         #resetting the item string verifier
         newstring = newstring.replace('',newstring)
 
@@ -119,7 +111,7 @@ word = (random.choice(validwords)).lower()
 
 #print(word)
 
-print(invalidwords)
+#print(len(validwords))
 
 #you figure it out I don't care anymore
 guesslen = len(word)
@@ -177,8 +169,8 @@ while guesslen > 0 and totallives > 0:
     #keep a life if you got a letter correct
     if count > 0 and guesslen > 0:
         guesslen -= count 
-        print("correct!",totallives,"lives left")  
-    #lose a life if you're wrong  
+        print("correct!",totallives,"lives left")
+    #lose a life if you're wrong
     else:
         totallives -= 1
         print("wrong, you have",totallives,"lives left")    
@@ -202,12 +194,37 @@ if totallives == 0:
     print(" ")
     print("you died. The word was",word)
     print(" ")
+    if all(x == "_" for x in hiddenword):
+        print("Awful game, you got NO letters right!!")
 # if you wan t know the word meaning
-question = input("do you want to know the meaning of " + word+"? ")
+response = requests.get("https://api.dictionaryapi.dev/api/v2/entries/en/" + word)
+#print(response)
 
-try: 
-    #if first letter is y 
-    if question[0].lower() == "y":    
-        webbrowser.open('https://www.merriam-webster.com/dictionary/' + word)
-except IndexError:
-    pass
+#if the webpage of the word defintition actually exists
+if response.status_code == 200:
+    #stealing all the data from a web page
+    apiData = json.loads(json.dumps(response.json()))
+    #apiData = json.loads(apiData)
+    #print(apiData)
+
+    try:
+        #looking through each definition of the word
+        for eachDefinition in apiData[0]["meanings"][0]["definitions"]:
+            
+            #for the first or only definition for a word
+            if apiData[0]["meanings"][0]["definitions"].index(eachDefinition) == 0:
+                question = input("do you want to know the meaning of " + word + "? ")
+            #if there is more than one definition of a word
+            else:
+                question = input("do you want to know the next meaning of " + word + "? ")
+            #printing the definition to the user in the termnial
+            if question[0].lower() == "y":
+                print(eachDefinition["definition"])
+            else:
+                break
+    except IndexError:
+        pass
+
+#if the definition webpage for the word doesn't exist
+else:
+    print("No meaning available.")
