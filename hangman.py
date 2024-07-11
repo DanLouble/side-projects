@@ -220,6 +220,7 @@ if response.status_code == 200:
             #printing the definition to the user in the termnial
             if question[0].lower() == "y":
                 print(eachDefinition["definition"])
+                print("")
             else:
                 break
     except IndexError:
