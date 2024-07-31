@@ -134,7 +134,7 @@ while guesslen > 0 and totallives > 0:
         print("Incorrect letters: ", *wrongLetters)
 
     #guess inputer
-    guess = (input("guess a letter:")).lower()
+    guess = input("guess a letter:").lower()
 
     #input validation to stop you from entering a key that is a duplicate, non-letter or multiple letters at a time
     while guess in enteredletterlist or guess.isalpha() == False or len(guess) > 1:
@@ -219,8 +219,7 @@ if response.status_code == 200:
                 question = input("do you want to know the next meaning of " + word + "? ")
             #printing the definition to the user in the termnial
             if question[0].lower() == "y":
-                print(eachDefinition["definition"])
-                print("")
+                print(eachDefinition["definition"]+"\n")
             else:
                 break
     except IndexError:
