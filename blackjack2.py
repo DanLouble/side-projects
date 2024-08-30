@@ -39,6 +39,7 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.hand = []
+        self.autowin = None
     def dealCard(self, numberOfCards):
         for i in range(numberOfCards):
             card = random.choice(cardDeck)
@@ -60,6 +61,16 @@ class Player:
             localTotal -= 10
             aces -= 0
         return localTotal
+    
+    def printHand(self):
+        for eachCard in self.hand:
+            print(*eachCard, sep=" of ", end="")
+            if self.hand.index(eachCard) != len(self.hand) - 1:
+                print(", ", end="")
+        print()
+
+    def setAutowin(self, autowinValue):
+        self.autowin = autowinValue
 
 
 players = []
@@ -73,26 +84,45 @@ winners = []
 
 for playerNum in range(numberOfPlayers + 1):
 
-    players[playerNum].dealCard(2)
-
     playing = True
 
+    if players[playerNum].numberTotal() == 21:
+        players[playerNum].printHand()
+        print("Blackjack!")
+        players[playerNum].setAutowin(False)
+        playing = False
+
+    players[playerNum].dealCard(2)
+
+    
+    print("\n" + players[playerNum].name + "'s Turn")
     while playing:
         
-        print(players[playerNum].hand)
+        players[playerNum].printHand()
         total = players[playerNum].numberTotal()
-        print(players[playerNum].name, "has", total)
         if total > 21:
-            print(players[playerNum].name, "has gone bust at", total)
             playing = False
-                
-        else:
+            players[playerNum].setAutowin(False)
+            print(players[playerNum].name, "has gone bust at", total)
 
+        elif len(players[playerNum].hand) == 7:
+            print("7 Card Charlie")
+            players[playerNum].setAutowin(True)
+            playing = False
+
+        else:
+            print(players[playerNum].name, "has", total)
+
+            #Dealer making decision
             if playerNum == numberOfPlayers:
                 if players[playerNum].numberTotal() < 17:
                     hit = "y"
+                    print("Dealer hits...")
+                    time.sleep(1)
                 else:
                     hit = "n"
+                    print("Dealer stands.")
+                    time.sleep(1)
             else:
                 hit = input("Would you like to hit or stand? ")
 
@@ -103,11 +133,13 @@ for playerNum in range(numberOfPlayers + 1):
 
 
 for eachPlayer in players:
-    if eachPlayer.numberTotal() > players[numberOfPlayers].numberTotal():
+    if (eachPlayer.numberTotal() > players[-1].numberTotal() and eachPlayer.autowin != False) or eachPlayer.autowin == True:
         winners.append(eachPlayer.name)
 
-if len(winners) >= 1:
-    print(", ".join(winners), "beat the dealer!")
+if len(winners) > 1:
+    print(", ".join(winners[:-1]), "and", winners[-1], "beat the dealer!")
+elif len(winners) == 1:
+    print(winners[0], "beat the dealer!")
 else:
     print("No one beat the dealer...")
 #dealer's hands
