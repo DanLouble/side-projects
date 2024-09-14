@@ -17,20 +17,6 @@ for eachsuit in cardTypes:
             rank = str(i)
         cardDeck.append((rank, eachsuit))
 
-#print(cardDeck)
-
-def balanceUpdater():
-
-    
-    with open("/home/danny/Desktop/vs code/BlackjackBalance.txt","w")as balanceFile:
-        balanceFile.write(str(gamblingBalance))
-
-
-
-with open("/home/danny/Desktop/vs code/BlackjackBalance.txt", "r") as balanceFile:
-    gamblingBalance = int(balanceFile.read())
-    if gamblingBalance <= 20:
-        gamblingBalance += 100
         
 
 
@@ -39,7 +25,7 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.hand = []
-        self.autowin = None
+        self.autowin = False
     def dealCard(self, numberOfCards):
         for i in range(numberOfCards):
             card = random.choice(cardDeck)
@@ -69,8 +55,8 @@ class Player:
                 print(", ", end="")
         print()
 
-    def setAutowin(self, autowinValue):
-        self.autowin = autowinValue
+    def setAutowin(self):
+        self.autowin = True
 
 
 players = []
@@ -80,34 +66,33 @@ for i in range(numberOfPlayers):
     players.append(Player(name))
 players.append(Player("DEALER"))
 
-winners = []
 
 for playerNum in range(numberOfPlayers + 1):
 
     playing = True
 
-    if players[playerNum].numberTotal() == 21:
-        players[playerNum].printHand()
-        print("Blackjack!")
-        players[playerNum].setAutowin(False)
-        playing = False
+    print("\n" + players[playerNum].name + "'s Turn")
 
     players[playerNum].dealCard(2)
 
+    if players[playerNum].numberTotal() == 21:
+        players[playerNum].printHand()
+        print("Blackjack!")
+        players[playerNum].setAutowin()
+        playing = False
+
     
-    print("\n" + players[playerNum].name + "'s Turn")
     while playing:
         
         players[playerNum].printHand()
         total = players[playerNum].numberTotal()
         if total > 21:
             playing = False
-            players[playerNum].setAutowin(False)
             print(players[playerNum].name, "has gone bust at", total)
 
         elif len(players[playerNum].hand) == 7:
             print("7 Card Charlie")
-            players[playerNum].setAutowin(True)
+            players[playerNum].setAutowin()
             playing = False
 
         else:
@@ -131,10 +116,12 @@ for playerNum in range(numberOfPlayers + 1):
             else:
                 playing = False
 
+winners = []
 
-for eachPlayer in players:
-    if (eachPlayer.numberTotal() > players[-1].numberTotal() and eachPlayer.autowin != False) or eachPlayer.autowin == True:
+for eachPlayer in players[:-1]:
+    if (eachPlayer.numberTotal() > players[-1].numberTotal() or players[-1].numberTotal() > 21 or eachPlayer.autowin) and eachPlayer.numberTotal() <= 21:
         winners.append(eachPlayer.name)
+    
 
 if len(winners) > 1:
     print(", ".join(winners[:-1]), "and", winners[-1], "beat the dealer!")
