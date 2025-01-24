@@ -34,7 +34,7 @@ def buzzOn():
 #defining what happens when the button is released
 def buzzOff():
     global finish, timeOff
-    #taking a finish time
+    #taking a finish time when the button is released
     finish = time.time()
     #turning the buzzer off
     buzzer.off()
@@ -54,7 +54,7 @@ def duplicateWords(sentencelist):
 
         if i == 0 or sentencelist[i] != sentencelist[i -1]:
             normal.append(sentencelist[i])
-    print("sentence list -"," ".join(normal))
+    print("sentence list - '" + " ".join(normal) + "'")
 
 #selector variables
 short = 0.1
